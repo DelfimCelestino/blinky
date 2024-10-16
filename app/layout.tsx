@@ -6,6 +6,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import PWAInstallPrompt from "@/components/pwa-install";
 import Header from "@/components/header";
 import { UniversalProvider } from "@/context/Universal-context-provider";
+import Script from "next/script";
 
 const roboto_condensed = Roboto_Condensed({ subsets: ["latin"] });
 
@@ -28,6 +29,14 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <Script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4787090241107157"
+          crossOrigin="anonymous"
+          strategy="lazyOnload"
+        />
+      </head>
       <body className={roboto_condensed.className}>
         <ThemeProvider
           attribute="class"
