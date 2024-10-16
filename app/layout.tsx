@@ -38,9 +38,9 @@ export default function RootLayout({
           <UniversalProvider>
             <Header />
             <main className="pt-16">{children}</main>
-            <PWAInstallPrompt />
           </UniversalProvider>
         </ThemeProvider>
+        <PWAInstallPrompt />
         <Toaster />
       </body>
     </html>
