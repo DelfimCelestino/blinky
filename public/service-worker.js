@@ -1,4 +1,4 @@
-const cacheName = "blinky-cache-beta-v2"; // Atualize a versão conforme necessário
+const cacheName = "blinky-cache-beta-v3"; // Atualize a versão conforme necessário
 
 const installEvent = () => {
   self.addEventListener("install", (event) => {
