@@ -1,36 +1,28 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Projeto Blinky - Plataforma de Gerenciamento de Projetos
 
-## Getting Started
+## Descrição
 
-First, run the development server:
+**Blinky** é uma plataforma inovadora de gerenciamento de projetos, desenvolvida para ajudar equipes e indivíduos a organizarem suas tarefas de forma simples, intuitiva e eficiente. Com a presença do nosso mascote, o simpático "Blinky", facilitamos a gestão do seu tempo e a organização de tarefas através de uma interface amigável, visual e prática.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Blinky segura a sua lista de tarefas, pronto para ajudar a verificar o progresso do seu projeto e marcar suas conquistas!
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Funcionalidades
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **Gerenciamento de Tarefas:** Crie, edite e organize suas tarefas por prioridade, data de vencimento e progresso.
+- **Listas e Subtarefas:** Divida projetos grandes em listas e subtarefas para facilitar o acompanhamento.
+- **Atribuição de Tarefas:** Distribua responsabilidades entre os membros da equipe.
+- **Colaboração em Equipe:** Trabalhe em conjunto com seus colegas, com visibilidade completa do progresso.
+- **Notificações e Lembretes:** Nunca perca um prazo com alertas personalizáveis.
+- **Integração com Calendário:** Visualize suas tarefas e prazos diretamente no seu calendário.
+- **Relatórios de Desempenho:** Acompanhe o progresso do projeto com relatórios detalhados.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Mascote: Blinky
 
-## Learn More
+O mascote do projeto, **Blinky**, é um fantasma simpático que segura uma lista de tarefas. Ele simboliza a organização e a agilidade na conclusão dos projetos. Sempre que você concluir uma tarefa, o Blinky estará lá para celebrar junto com você!
 
-To learn more about Next.js, take a look at the following resources:
+## Como Usar
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. **Clone o repositório:**
+   ```bash
+   git clone https://github.com/delfimcelestino/blinky.git
+   ```
