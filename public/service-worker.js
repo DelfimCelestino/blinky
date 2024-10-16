@@ -1,10 +1,9 @@
-const cacheName = "blinky-cache-beta";
+const cacheName = "blinky-cache-beta-v2"; // Atualize a versão conforme necessário
 
 const installEvent = () => {
   self.addEventListener("install", (event) => {
     console.log("Service worker installed");
-    // Skip waiting to activate this service worker immediately
-    self.skipWaiting();
+    self.skipWaiting(); // Ativa o novo service worker imediatamente
   });
 };
 installEvent();
@@ -12,7 +11,7 @@ installEvent();
 const activateEvent = () => {
   self.addEventListener("activate", (event) => {
     console.log("Service worker activated");
-    // Remove old caches if necessary
+    // Remove caches antigos
     event.waitUntil(
       caches.keys().then((cacheNames) => {
         return Promise.all(
@@ -29,35 +28,14 @@ const activateEvent = () => {
 };
 activateEvent();
 
-const activePush = () => {
-  self.addEventListener("push", (event) => {
-    console.log("Push received", event);
-    const data = event.data.json();
-    const title = data.title;
-    const body = data.body;
-    const icon = data.icon;
-    const url = data.data.url;
-
-    const notificationOptions = {
-      body: body,
-      tag: Date.now().toString(),
-      icon: icon,
-      data: { url: url },
-    };
-
-    self.registration.showNotification(title, notificationOptions);
-  });
-};
-activePush();
-
 const fetchEvent = () => {
   self.addEventListener("fetch", (event) => {
     // Verifica se a requisição é para a API
     if (event.request.url.includes("/api/")) {
+      // Para requisições de API, busca a resposta e atualiza o cache
       event.respondWith(
         fetch(event.request)
           .then((response) => {
-            // Cache a nova resposta para futuras requisições
             const responseClone = response.clone();
             caches.open(cacheName).then((cache) => {
               cache.put(event.request, responseClone);
@@ -73,16 +51,16 @@ const fetchEvent = () => {
       // Para páginas e recursos estáticos
       event.respondWith(
         caches.match(event.request).then((cachedResponse) => {
-          return (
-            cachedResponse ||
-            fetch(event.request).then((response) => {
-              const responseClone = response.clone();
-              caches.open(cacheName).then((cache) => {
-                cache.put(event.request, responseClone);
-              });
-              return response;
-            })
-          );
+          const fetchPromise = fetch(event.request).then((response) => {
+            const responseClone = response.clone();
+            caches.open(cacheName).then((cache) => {
+              cache.put(event.request, responseClone);
+            });
+            return response;
+          });
+
+          // Retorna o conteúdo do cache imediatamente, e atualiza em segundo plano
+          return cachedResponse || fetchPromise;
         })
       );
     }
