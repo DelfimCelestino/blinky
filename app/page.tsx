@@ -12,9 +12,7 @@ export default function Home() {
   return (
     <div className="container mx-auto p-4 space-y-8">
       <div className="flex justify-between items-center">
-        <h1 className="text-lg lg:text-xl font-bold">
-          Blinky - Gerenciamento de Projetos e Finanças
-        </h1>
+        <h1 className="text-lg lg:text-xl font-bold">Hello 😊</h1>
         <ModeToggle />
       </div>
 
