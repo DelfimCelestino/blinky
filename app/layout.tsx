@@ -37,7 +37,7 @@ export default function RootLayout({
         >
           <UniversalProvider>
             <Header />
-            <main className="pt-16">{children}</main>
+            <main className="py-16">{children}</main>
           </UniversalProvider>
         </ThemeProvider>
         <PWAInstallPrompt />
