@@ -1,5 +1,5 @@
 import Image from "next/image";
-import AddProjectButton from "@/components/add-project-button";
+import { AddProjectButton } from "@/components/add-project-button";
 
 const Header = () => {
   return (

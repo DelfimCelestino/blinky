@@ -4,6 +4,6 @@ export interface Project {
   progress: number;
   status: "Não Iniciado" | "Em Andamento" | "Concluído";
   manager: string;
-  createdAt: number;
-  lastUpdated: number;
+  createdAt: Date;
+  lastUpdated: Date;
 }

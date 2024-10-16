@@ -1,5 +1,11 @@
 "use client";
-
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Plus, Loader2 } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Slider } from "@/components/ui/slider"; // Importando o Slider
+import { useUniversalContext } from "@/context/Universal-context-provider";
 import {
   Dialog,
   DialogContent,
@@ -14,68 +20,57 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Slider } from "@/components/ui/slider";
-
 import { useToast } from "@/hooks/use-toast";
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { useUniversalContext } from "@/context/Universal-context-provider";
+import { Project } from "@/types/types";
 
-interface Project {
-  id: string;
-  name: string;
-  progress: number;
-  status: "Não Iniciado" | "Em Andamento" | "Concluído";
-  manager: string;
-  createdAt: number;
-  lastUpdated: number;
-}
+export const AddProjectButton = () => {
+  const { addProject } = useUniversalContext();
+  const { toast } = useToast();
 
-const AddProjectButton = () => {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
+  const [progress, setProgress] = useState(0);
   const [status, setStatus] = useState<
     "Não Iniciado" | "Em Andamento" | "Concluído"
   >("Não Iniciado");
-  const [progress, setProgress] = useState(0);
   const [manager, setManager] = useState("");
-  const { projects, setProjects } = useUniversalContext();
-  const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleStatusChange = (value: string) => {
-    setStatus(value as "Não Iniciado" | "Em Andamento" | "Concluído");
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const newProject: Project = {
-      id: Date.now().toString(),
+
+    if (!name || !manager) {
+      toast({
+        title: "Erro de validação",
+        description: "O nome e o gerente do projeto são obrigatórios.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsLoading(true);
+
+    const newProject: Omit<Project, "id" | "createdAt" | "lastUpdated"> = {
       name,
       progress,
       status,
       manager,
-      createdAt: Date.now(),
-      lastUpdated: Date.now(),
     };
 
-    const updatedProjects = [...projects, newProject];
-    setProjects(updatedProjects);
-    localStorage.setItem("projects", JSON.stringify(updatedProjects));
-
-    setName("");
-    setStatus("Não Iniciado");
-    setProgress(0);
-    setManager("");
-    setOpen(false);
-
-    toast({
-      title: "Projeto adicionado",
-      description: "Seu novo projeto foi adicionado com sucesso.",
-    });
+    try {
+      await addProject(newProject);
+      setName("");
+      setStatus("Não Iniciado");
+      setProgress(0);
+      setManager("");
+      setOpen(false);
+    } catch (error) {
+      console.error("Error adding project:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -83,36 +78,37 @@ const AddProjectButton = () => {
           <Plus className="mr-2 h-4 w-4" /> Adicionar Projeto
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent>
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold">
-            Adicionar Novo Projeto
-          </DialogTitle>
+          <DialogTitle>Novo Projeto</DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit}>
           <div className="space-y-2">
             <Label htmlFor="name">Nome do Projeto</Label>
             <Input
               id="name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              required
             />
-          </div>
-          <div className="space-y-2">
+
             <Label htmlFor="manager">Gerente do Projeto</Label>
             <Input
               id="manager"
               value={manager}
               onChange={(e) => setManager(e.target.value)}
-              required
             />
-          </div>
-          <div className="space-y-2">
+
             <Label htmlFor="status">Status</Label>
-            <Select onValueChange={handleStatusChange} defaultValue={status}>
+            <Select
+              onValueChange={(value) =>
+                setStatus(
+                  value as "Não Iniciado" | "Em Andamento" | "Concluído"
+                )
+              }
+              value={status}
+            >
               <SelectTrigger>
-                <SelectValue placeholder="Selecione o status" />
+                <SelectValue placeholder="Selecionar status" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="Não Iniciado">Não Iniciado</SelectItem>
@@ -120,32 +116,25 @@ const AddProjectButton = () => {
                 <SelectItem value="Concluído">Concluído</SelectItem>
               </SelectContent>
             </Select>
+
+            <Label htmlFor="progress">Progresso (%)</Label>
+            {/* Slider para progresso */}
+            <Slider
+              value={[progress]}
+              onValueChange={(value) => setProgress(value[0])}
+              max={100}
+              step={1}
+            />
+            <div className="text-sm text-gray-500">Progresso: {progress}%</div>
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="progress">Progresso</Label>
-            <div className="flex items-center space-x-2">
-              <Slider
-                id="progress"
-                min={0}
-                max={100}
-                step={1}
-                value={[progress]}
-                onValueChange={(value) => setProgress(value[0])}
-                className="flex-grow"
-              />
-              <span>{progress}%</span>
-            </div>
+          <div className="mt-4">
+            <Button type="submit" disabled={isLoading}>
+              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Adicionar Projeto
+            </Button>
           </div>
-          <Button
-            type="submit"
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-          >
-            Adicionar Projeto
-          </Button>
         </form>
       </DialogContent>
     </Dialog>
   );
 };
-
-export default AddProjectButton;
