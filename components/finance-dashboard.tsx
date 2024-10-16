@@ -277,67 +277,76 @@ export default function FinanceDashboard() {
           <TabsTrigger value="savings">Metas de Economia</TabsTrigger>
         </TabsList>
         <TabsContent value="overview">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
-            <Card>
-              <CardHeader>
-                <CardTitle>Visão Geral Financeira</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <LineChart data={chartData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
-                    <YAxis />
-                    <Tooltip />
-                    <Legend />
-                    <Line type="monotone" dataKey="amount" stroke="#8884d8" />
-                  </LineChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
-            <AnimatePresence>
-              {savingsGoals.map((goal) => {
-                const progress = (balance / goal.targetAmount) * 100;
-                const alertMessage =
-                  balance >= goal.targetAmount
-                    ? "Você pode comprar esse item."
-                    : null;
+          <Card>
+            <CardHeader>
+              <CardTitle>Visão Geral Financeira</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={300}>
+                <LineChart data={chartData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="name" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Line type="monotone" dataKey="amount" stroke="#8884d8" />
+                </LineChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+          <AnimatePresence>
+            {savingsGoals.map((goal) => {
+              const progress = (balance / goal.targetAmount) * 100;
+              const alertMessage =
+                balance >= goal.targetAmount
+                  ? "Você pode comprar esse item."
+                  : null;
 
-                return (
-                  <motion.div
-                    key={goal.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20 }}
-                    className="mb-4 p-4 rounded-lg"
-                  >
-                    <h1>Suas metas:</h1>
-                    <div className="flex justify-between items-center">
-                      <h2 className="text-xl font-semibold">{goal.name}</h2>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => deleteSavingsGoal(goal.id)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                    <Progress value={progress} max={100} className="h-2 mt-2" />
-                    <p className="text-sm mt-1">
-                      Progresso: {progress.toFixed(2)}% (Meta: $
-                      {goal.targetAmount.toFixed(2)}, Atual: $
-                      {balance.toFixed(2)})
+              return (
+                <motion.div
+                  key={goal.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  className="mb-4 p-4 rounded-lg"
+                >
+                  <h1>Suas metas:</h1>
+                  <div className="flex justify-between items-center">
+                    <h2 className="text-xl font-semibold">{goal.name}</h2>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => deleteSavingsGoal(goal.id)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  <Progress
+                    value={progress}
+                    max={100}
+                    className="h-2 mt-2"
+                    color={
+                      progress >= 100
+                        ? "bg-green-400"
+                        : progress >= 50
+                        ? "bg-yellow-400"
+                        : "bg-red-400"
+                    }
+                  />
+                  <p className="text-sm mt-1">
+                    Progresso: {progress.toFixed(2)}% (Meta: $
+                    {goal.targetAmount.toFixed(2)}, Atual: ${balance.toFixed(2)}
+                    )
+                  </p>
+                  {alertMessage && (
+                    <p className="text-green-500 text-sm mt-1">
+                      {alertMessage}
                     </p>
-                    {alertMessage && (
-                      <p className="text-green-500 text-sm mt-1">
-                        {alertMessage}
-                      </p>
-                    )}
-                  </motion.div>
-                );
-              })}
-            </AnimatePresence>
-          </div>
+                  )}
+                </motion.div>
+              );
+            })}
+          </AnimatePresence>
         </TabsContent>
         <TabsContent value="income-expenses">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -679,6 +688,13 @@ export default function FinanceDashboard() {
                         value={progress}
                         max={100}
                         className="h-2 mt-2"
+                        color={
+                          progress >= 100
+                            ? "bg-green-400"
+                            : progress >= 50
+                            ? "bg-green-400"
+                            : "bg-green-400"
+                        }
                       />
                       <p className="text-sm mt-1">
                         Progresso: {progress.toFixed(2)}% (Meta: $

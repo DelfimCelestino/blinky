@@ -1,13 +1,30 @@
+const cacheName = "blinky-cache-beta";
+
 const installEvent = () => {
-  self.addEventListener("install", () => {
-    console.log("service worker installed");
+  self.addEventListener("install", (event) => {
+    console.log("Service worker installed");
+    // Skip waiting to activate this service worker immediately
+    self.skipWaiting();
   });
 };
 installEvent();
 
 const activateEvent = () => {
-  self.addEventListener("activate", () => {
-    console.log("service worker activated");
+  self.addEventListener("activate", (event) => {
+    console.log("Service worker activated");
+    // Remove old caches if necessary
+    event.waitUntil(
+      caches.keys().then((cacheNames) => {
+        return Promise.all(
+          cacheNames.map((name) => {
+            if (name !== cacheName) {
+              console.log(`Deleting old cache: ${name}`);
+              return caches.delete(name);
+            }
+          })
+        );
+      })
+    );
   });
 };
 activateEvent();
@@ -23,50 +40,52 @@ const activePush = () => {
 
     const notificationOptions = {
       body: body,
-      tag: Date.now().toString(), // Use timestamp as a unique tag
+      tag: Date.now().toString(),
       icon: icon,
-      data: {
-        url: url, // Replace with the desired URL for redirecting user to the desired page
-      },
+      data: { url: url },
     };
 
     self.registration.showNotification(title, notificationOptions);
   });
 };
 activePush();
-const cacheName = "blinky-cache-beta";
-
-const cacheClone = async (e) => {
-  const res = await fetch(e.request);
-  const resClone = res.clone();
-
-  const cache = await caches.open(cacheName);
-  await cache.put(e.request, resClone);
-
-  return res;
-};
 
 const fetchEvent = () => {
-  try {
-    self.addEventListener("fetch", (e) => {
-      e.respondWith(
-        cacheClone(e)
-          .catch(() => caches.match(e.request))
-          .then((res) => {
+  self.addEventListener("fetch", (event) => {
+    // Verifica se a requisição é para a API
+    if (event.request.url.includes("/api/")) {
+      event.respondWith(
+        fetch(event.request)
+          .then((response) => {
+            // Cache a nova resposta para futuras requisições
+            const responseClone = response.clone();
             caches.open(cacheName).then((cache) => {
-              cache.keys().then((keys) => {
-                if (keys.length > 0) {
-                  console.log("pages cached done");
-                }
-              });
+              cache.put(event.request, responseClone);
             });
-            return res;
+            return response;
+          })
+          .catch(() => {
+            // Se a requisição falhar, tenta retornar do cache
+            return caches.match(event.request);
           })
       );
-    });
-  } catch (error) {
-    alert(error.message);
-  }
+    } else {
+      // Para páginas e recursos estáticos
+      event.respondWith(
+        caches.match(event.request).then((cachedResponse) => {
+          return (
+            cachedResponse ||
+            fetch(event.request).then((response) => {
+              const responseClone = response.clone();
+              caches.open(cacheName).then((cache) => {
+                cache.put(event.request, responseClone);
+              });
+              return response;
+            })
+          );
+        })
+      );
+    }
+  });
 };
-
 fetchEvent();

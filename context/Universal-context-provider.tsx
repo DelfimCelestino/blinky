@@ -64,6 +64,12 @@ export const UniversalProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     fetchProjects();
+    if ("serviceWorker" in navigator) {
+      const handleServiceWorker = async () => {
+        await navigator.serviceWorker.register("/service-worker.js");
+      };
+      handleServiceWorker();
+    }
   }, [fetchProjects]);
 
   // Função para adicionar projeto

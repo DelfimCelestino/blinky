@@ -163,6 +163,8 @@ export default function ProjectManage() {
                   </div>
                   <Progress
                     value={project.progress}
+                    max={100}
+                    color={getStatusColor(project.status)}
                     className="w-full h-2 mb-2 bg-gray-200 dark:bg-gray-700"
                   />
                   <div className="text-sm text-gray-600 dark:text-gray-300">
