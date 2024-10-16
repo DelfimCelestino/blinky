@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { ThemeProvider } from "@/components/theme-provider";
 import PWAInstallPrompt from "@/components/pwa-install";
 import Header from "@/components/header";
+import { UniversalProvider } from "@/context/Universal-context-provider";
 
 const roboto_condensed = Roboto_Condensed({ subsets: ["latin"] });
 
@@ -34,9 +35,11 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <Header />
-          <main className="pt-16">{children}</main>
-          <PWAInstallPrompt />
+          <UniversalProvider>
+            <Header />
+            <main className="pt-16">{children}</main>
+            <PWAInstallPrompt />
+          </UniversalProvider>
         </ThemeProvider>
         <Toaster />
       </body>

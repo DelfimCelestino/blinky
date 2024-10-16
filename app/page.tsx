@@ -41,21 +41,12 @@ import {
   Pie,
   Cell,
 } from "recharts";
-
-interface Project {
-  id: string;
-  name: string;
-  progress: number;
-  status: "Não Iniciado" | "Em Andamento" | "Concluído";
-  manager: string;
-  createdAt: number;
-  lastUpdated: number;
-}
+import { Project } from "@/types/types";
+import { useUniversalContext } from "@/context/Universal-context-provider";
 
 const COLORS = ["#FF6384", "#36A2EB", "#FFCE56"];
 
 export default function GerenciadorDeProjetos() {
-  const [projects, setProjects] = useState<Project[]>([]);
   const [name, setName] = useState("");
   const [status, setStatus] = useState<
     "Não Iniciado" | "Em Andamento" | "Concluído"
@@ -67,19 +58,7 @@ export default function GerenciadorDeProjetos() {
   const [statusFilter, setStatusFilter] = useState("Todos");
   const { toast } = useToast();
 
-  useEffect(() => {
-    const storedProjects = localStorage.getItem("projects");
-    if (storedProjects) {
-      setProjects(JSON.parse(storedProjects));
-    }
-    if ("serviceWorker" in navigator) {
-      const handleServiceWorker = async () => {
-        await navigator.serviceWorker.register("/service-worker.js");
-      };
-
-      handleServiceWorker();
-    }
-  }, []);
+  const { projects, setProjects } = useUniversalContext();
 
   const deleteProject = (id: string) => {
     const updatedProjects = projects.filter((project) => project.id !== id);

@@ -22,6 +22,7 @@ import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useUniversalContext } from "@/context/Universal-context-provider";
 
 interface Project {
   id: string;
@@ -41,7 +42,7 @@ const AddProjectButton = () => {
   >("Não Iniciado");
   const [progress, setProgress] = useState(0);
   const [manager, setManager] = useState("");
-  const [projects, setProjects] = useState<Project[]>([]);
+  const { projects, setProjects } = useUniversalContext();
   const { toast } = useToast();
 
   const handleStatusChange = (value: string) => {
