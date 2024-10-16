@@ -16,10 +16,10 @@ interface UniversalContextType {
   isLoading: boolean;
   addProject: (
     project: Omit<Project, "id" | "createdAt" | "lastUpdated">
-  ) => Promise<void>;
-  updateProject: (project: Project) => Promise<void>;
-  deleteProject: (id: string) => Promise<void>;
-  fetchProjects: () => Promise<void>;
+  ) => void; // Mudado para void, pois não há async/await no Local Storage
+  updateProject: (project: Project) => void; // Mudado para void
+  deleteProject: (id: string) => void; // Mudado para void
+  fetchProjects: () => void; // Mudado para void
 }
 
 const MyUniversalContext = createContext<UniversalContextType | undefined>(
@@ -31,30 +31,17 @@ export const UniversalProvider = ({ children }: { children: ReactNode }) => {
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
 
-  // Função para buscar projetos
-  const fetchProjects = useCallback(async () => {
+  // Função para buscar projetos do Local Storage
+  const fetchProjects = useCallback(() => {
     setIsLoading(true);
     try {
-      const response = await fetch("/api/projects");
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(
-          errorData.error ||
-            `Erro ${response.status}: Falha ao buscar projetos.`
-        );
-      }
-      const data = await response.json();
+      const data = JSON.parse(localStorage.getItem("projects") || "[]");
       setProjects(data);
-    } catch (error: unknown) {
-      const message =
-        error instanceof Error
-          ? error.message
-          : "Erro desconhecido ao buscar projetos";
-      console.error("Erro ao buscar projetos:", message);
+    } catch (error) {
+      console.error("Erro ao buscar projetos do Local Storage:", error);
       toast({
         title: "Erro",
-        description:
-          "Não foi possível carregar os projetos. Verifique a conexão ou o servidor.",
+        description: "Não foi possível carregar os projetos.",
         variant: "destructive",
       });
     } finally {
@@ -74,40 +61,28 @@ export const UniversalProvider = ({ children }: { children: ReactNode }) => {
 
   // Função para adicionar projeto
   const addProject = useCallback(
-    async (newProject: Omit<Project, "id" | "createdAt" | "lastUpdated">) => {
+    (newProject: Omit<Project, "id" | "createdAt" | "lastUpdated">) => {
       try {
-        const response = await fetch("/api/projects", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(newProject),
-        });
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(
-            errorData.error ||
-              `Erro ${response.status}: Falha ao adicionar o projeto.`
-          );
-        }
-
-        const addedProject = await response.json();
-        setProjects((prevProjects) => [...prevProjects, addedProject]);
+        const projects = JSON.parse(localStorage.getItem("projects") || "[]");
+        const addedProject = {
+          id: Date.now().toString(), // Gerar um ID único
+          ...newProject,
+          createdAt: new Date().toISOString(),
+          lastUpdated: new Date().toISOString(),
+        };
+        projects.push(addedProject);
+        localStorage.setItem("projects", JSON.stringify(projects));
+        setProjects(projects);
 
         toast({
           title: "Projeto adicionado",
           description: "Seu novo projeto foi adicionado com sucesso.",
         });
-      } catch (error: unknown) {
-        const message =
-          error instanceof Error
-            ? error.message
-            : "Erro desconhecido ao adicionar projeto";
-        console.error("Erro ao adicionar projeto:", message);
+      } catch (error) {
+        console.error("Erro ao adicionar projeto:", error);
         toast({
           title: "Erro",
-          description: `Não foi possível adicionar o projeto: ${message}`,
+          description: `Não foi possível adicionar o projeto: ${error}`,
           variant: "destructive",
         });
       }
@@ -117,42 +92,24 @@ export const UniversalProvider = ({ children }: { children: ReactNode }) => {
 
   // Função para atualizar projeto
   const updateProject = useCallback(
-    async (updatedProject: Project) => {
+    (updatedProject: Project) => {
       try {
-        const response = await fetch(`/api/projects/${updatedProject.id}`, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(updatedProject),
-        });
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(
-            errorData.error ||
-              `Erro ${response.status}: Falha ao atualizar o projeto.`
-          );
-        }
-
-        const updated = await response.json();
-        setProjects((prevProjects) =>
-          prevProjects.map((p) => (p.id === updated.id ? updated : p))
+        const projects = JSON.parse(localStorage.getItem("projects") || "[]");
+        const updatedProjects = projects.map((p: Project) =>
+          p.id === updatedProject.id ? { ...updatedProject } : p
         );
+        localStorage.setItem("projects", JSON.stringify(updatedProjects));
+        setProjects(updatedProjects);
 
         toast({
           title: "Projeto atualizado",
           description: "O projeto foi atualizado com sucesso.",
         });
-      } catch (error: unknown) {
-        const message =
-          error instanceof Error
-            ? error.message
-            : "Erro desconhecido ao atualizar projeto";
-        console.error("Erro ao atualizar projeto:", message);
+      } catch (error) {
+        console.error("Erro ao atualizar projeto:", error);
         toast({
           title: "Erro",
-          description: `Não foi possível atualizar o projeto: ${message}`,
+          description: `Não foi possível atualizar o projeto: ${error}`,
           variant: "destructive",
         });
       }
@@ -162,35 +119,22 @@ export const UniversalProvider = ({ children }: { children: ReactNode }) => {
 
   // Função para excluir projeto
   const deleteProject = useCallback(
-    async (id: string) => {
+    (id: string) => {
       try {
-        const response = await fetch(`/api/projects/${id}`, {
-          method: "DELETE",
-        });
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(
-            errorData.error ||
-              `Erro ${response.status}: Falha ao excluir o projeto.`
-          );
-        }
-
-        setProjects((prevProjects) => prevProjects.filter((p) => p.id !== id));
+        const projects = JSON.parse(localStorage.getItem("projects") || "[]");
+        const updatedProjects = projects.filter((p: Project) => p.id !== id);
+        localStorage.setItem("projects", JSON.stringify(updatedProjects));
+        setProjects(updatedProjects);
 
         toast({
           title: "Projeto excluído",
           description: "O projeto foi removido com sucesso.",
         });
-      } catch (error: unknown) {
-        const message =
-          error instanceof Error
-            ? error.message
-            : "Erro desconhecido ao excluir projeto";
-        console.error("Erro ao excluir projeto:", message);
+      } catch (error) {
+        console.error("Erro ao excluir projeto:", error);
         toast({
           title: "Erro",
-          description: `Não foi possível excluir o projeto: ${message}`,
+          description: `Não foi possível excluir o projeto: ${error}`,
           variant: "destructive",
         });
       }

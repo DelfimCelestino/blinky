@@ -75,125 +75,122 @@ export default function FinanceDashboard() {
     fetchData();
   }, []);
 
-  const fetchData = async () => {
+  const fetchData = () => {
     setLoading(true);
-    await Promise.all([fetchIncome(), fetchExpenses(), fetchSavingsGoals()]);
+    const incomeData = JSON.parse(localStorage.getItem("income") || "[]");
+    const expensesData = JSON.parse(localStorage.getItem("expenses") || "[]");
+    const savingsGoalsData = JSON.parse(
+      localStorage.getItem("savingsGoals") || "[]"
+    );
+
+    const incomeWithDates = incomeData.map((item: Income) => ({
+      ...item,
+      date: new Date(item.date),
+    }));
+
+    const expensesWithDates = expensesData.map((item: Expense) => ({
+      ...item,
+      date: new Date(item.date),
+    }));
+
+    setIncome(incomeWithDates);
+    setExpenses(expensesWithDates);
+    setSavingsGoals(savingsGoalsData);
     setLoading(false);
   };
 
-  const fetchIncome = async () => {
-    const response = await fetch("/api/income");
-    const data = await response.json();
-    const incomeWithDates = data.map((item: Income) => ({
-      ...item,
-      date: new Date(item.date),
-    }));
-    setIncome(incomeWithDates);
-  };
-
-  const fetchExpenses = async () => {
-    const response = await fetch("/api/expenses");
-    const data = await response.json();
-    const expensesWithDates = data.map((item: Expense) => ({
-      ...item,
-      date: new Date(item.date),
-    }));
-    setExpenses(expensesWithDates);
-  };
-
-  const fetchSavingsGoals = async () => {
-    const response = await fetch("/api/savings-goals");
-    const data = await response.json();
-    setSavingsGoals(data);
-  };
-
-  const addIncome = async (newIncome: Omit<Income, "id">) => {
-    const response = await fetch("/api/income", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(newIncome),
+  const addIncome = (newIncome: Omit<Income, "id">) => {
+    const incomeData = JSON.parse(localStorage.getItem("income") || "[]");
+    const addedIncome = {
+      id: Date.now().toString(), // Gerar um ID único
+      ...newIncome,
+      date: new Date(newIncome.date),
+    };
+    incomeData.push(addedIncome);
+    localStorage.setItem("income", JSON.stringify(incomeData));
+    setIncome(incomeData);
+    setShowIncomeDialog(false);
+    toast({
+      title: "Renda adicionada",
+      description: "Sua nova renda foi adicionada com sucesso.",
     });
-    if (response.ok) {
-      fetchIncome();
-      setShowIncomeDialog(false);
-      toast({
-        title: "Renda adicionada",
-        description: "Sua nova renda foi adicionada com sucesso.",
-      });
-    }
   };
 
-  const addExpense = async (newExpense: Omit<Expense, "id">) => {
-    const response = await fetch("/api/expenses", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(newExpense),
+  const addExpense = (newExpense: Omit<Expense, "id">) => {
+    const expensesData = JSON.parse(localStorage.getItem("expenses") || "[]");
+    const addedExpense = {
+      id: Date.now().toString(), // Gerar um ID único
+      ...newExpense,
+      date: new Date(newExpense.date),
+    };
+    expensesData.push(addedExpense);
+    localStorage.setItem("expenses", JSON.stringify(expensesData));
+    setExpenses(expensesData);
+    setShowExpenseDialog(false);
+    toast({
+      title: "Despesa adicionada",
+      description: "Sua nova despesa foi adicionada com sucesso.",
     });
-    if (response.ok) {
-      fetchExpenses();
-      setShowExpenseDialog(false);
-      toast({
-        title: "Despesa adicionada",
-        description: "Sua nova despesa foi adicionada com sucesso.",
-      });
-    }
   };
 
-  const addSavingsGoal = async (
+  const addSavingsGoal = (
     newGoal: Omit<SavingsGoal, "id" | "currentAmount">
   ) => {
-    const response = await fetch("/api/savings-goals", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ...newGoal, currentAmount: 0 }),
+    const savingsGoalsData = JSON.parse(
+      localStorage.getItem("savingsGoals") || "[]"
+    );
+    const addedGoal = {
+      id: Date.now().toString(), // Gerar um ID único
+      ...newGoal,
+      currentAmount: 0,
+    };
+    savingsGoalsData.push(addedGoal);
+    localStorage.setItem("savingsGoals", JSON.stringify(savingsGoalsData));
+    setSavingsGoals(savingsGoalsData);
+    setShowSavingsGoalDialog(false);
+    toast({
+      title: "Meta de economia adicionada",
+      description: "Sua nova meta de economia foi adicionada com sucesso.",
     });
-    if (response.ok) {
-      fetchSavingsGoals();
-      setShowSavingsGoalDialog(false);
-      toast({
-        title: "Meta de economia adicionada",
-        description: "Sua nova meta de economia foi adicionada com sucesso.",
-      });
-    }
   };
 
-  const deleteIncome = async (id: string) => {
-    const response = await fetch(`/api/income/${id}`, {
-      method: "DELETE",
+  const deleteIncome = (id: string) => {
+    const incomeData = JSON.parse(localStorage.getItem("income") || "[]");
+    const updatedIncome = incomeData.filter((item: Income) => item.id !== id);
+    localStorage.setItem("income", JSON.stringify(updatedIncome));
+    setIncome(updatedIncome);
+    toast({
+      title: "Renda removida",
+      description: "A renda foi removida com sucesso.",
     });
-    if (response.ok) {
-      fetchIncome();
-      toast({
-        title: "Renda removida",
-        description: "A renda foi removida com sucesso.",
-      });
-    }
   };
 
-  const deleteExpense = async (id: string) => {
-    const response = await fetch(`/api/expenses/${id}`, {
-      method: "DELETE",
+  const deleteExpense = (id: string) => {
+    const expensesData = JSON.parse(localStorage.getItem("expenses") || "[]");
+    const updatedExpenses = expensesData.filter(
+      (item: Expense) => item.id !== id
+    );
+    localStorage.setItem("expenses", JSON.stringify(updatedExpenses));
+    setExpenses(updatedExpenses);
+    toast({
+      title: "Despesa removida",
+      description: "A despesa foi removida com sucesso.",
     });
-    if (response.ok) {
-      fetchExpenses();
-      toast({
-        title: "Despesa removida",
-        description: "A despesa foi removida com sucesso.",
-      });
-    }
   };
 
-  const deleteSavingsGoal = async (id: string) => {
-    const response = await fetch(`/api/savings-goals/${id}`, {
-      method: "DELETE",
+  const deleteSavingsGoal = (id: string) => {
+    const savingsGoalsData = JSON.parse(
+      localStorage.getItem("savingsGoals") || "[]"
+    );
+    const updatedGoals = savingsGoalsData.filter(
+      (item: SavingsGoal) => item.id !== id
+    );
+    localStorage.setItem("savingsGoals", JSON.stringify(updatedGoals));
+    setSavingsGoals(updatedGoals);
+    toast({
+      title: "Meta de economia removida",
+      description: "A meta de economia foi removida com sucesso.",
     });
-    if (response.ok) {
-      fetchSavingsGoals();
-      toast({
-        title: "Meta de economia removida",
-        description: "A meta de economia foi removida com sucesso.",
-      });
-    }
   };
 
   const totalIncome = income.reduce((sum, item) => sum + item.amount, 0);
@@ -692,8 +689,8 @@ export default function FinanceDashboard() {
                           progress >= 100
                             ? "bg-green-400"
                             : progress >= 50
-                            ? "bg-green-400"
-                            : "bg-green-400"
+                            ? "bg-yellow-400"
+                            : "bg-red-400"
                         }
                       />
                       <p className="text-sm mt-1">

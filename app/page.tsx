@@ -12,7 +12,9 @@ export default function Home() {
   return (
     <div className="container mx-auto p-4 space-y-8">
       <div className="flex justify-between items-center">
-        <h1 className="text-lg lg:text-xl font-bold">Hello 😊,</h1>
+        <h1 className="text-lg lg:text-xl font-bold">
+          Assombre aqui seu dinheiro e projectos 👻
+        </h1>
         <ModeToggle />
       </div>
 
