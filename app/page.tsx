@@ -60,11 +60,17 @@ export default function Home() {
         </TabsContent>
       </Tabs>
 
-      <div className="fixed bottom-4 left-4 text-sm text-muted-foreground">
+      <div className="fixed bottom-4 left-4 text-sm text-muted-foreground flex items-center gap-2 bg-background/90 px-4 py-2 rounded-lg shadow-lg backdrop-blur-sm border border-border/35">
         <span>
           Made with ❤️ by{" "}
           <a href="https://github.com/delfimcelestino" className="underline">
             Delfim Celestino
+          </a>
+        </span>
+        <span className="flex items-center gap-2">
+          and
+          <a href="https://github.com/iassineiahaia" className="underline">
+            Iassine Iahaia
           </a>
         </span>
       </div>
