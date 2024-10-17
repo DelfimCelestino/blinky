@@ -52,7 +52,6 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { format, parse, startOfMonth, endOfMonth } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { useRouter, useSearchParams } from "next/navigation";
 
 // Types
 interface Income {
@@ -95,8 +94,6 @@ export default function FinanceDashboard() {
     format(new Date(), "yyyy-MM")
   );
   const { toast } = useToast();
-  const router = useRouter();
-  const searchParams = useSearchParams();
 
   // New state for form inputs
   const [newIncome, setNewIncome] = useState<Omit<Income, "id">>({
@@ -123,7 +120,7 @@ export default function FinanceDashboard() {
     fetchData();
 
     setSelectedMonth(format(new Date(), "yyyy-MM"));
-  }, [searchParams]);
+  }, []);
 
   const fetchData = () => {
     setLoading(true);

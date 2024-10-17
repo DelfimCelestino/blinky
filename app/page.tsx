@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import GerenciadorDeProjetos from "@/components/project-manage";
 import FinanceDashboard from "@/components/finance-dashboard";
@@ -18,18 +17,11 @@ const goodMorningMessages = [
 export default function Home() {
   const [activeTab, setActiveTab] = useState("projects");
   const [goodMorningMessage, setGoodMorningMessage] = useState("");
-  const router = useRouter();
-  const searchParams = useSearchParams();
 
   useEffect(() => {
-    const tab = searchParams.get("tab");
-    if (tab && (tab === "projects" || tab === "finances")) {
-      setActiveTab(tab);
-    }
-
     const randomIndex = Math.floor(Math.random() * goodMorningMessages.length);
     setGoodMorningMessage(goodMorningMessages[randomIndex]);
-  }, [searchParams]);
+  }, []);
 
   const handleTabChange = (value: string) => {
     setActiveTab(value);
