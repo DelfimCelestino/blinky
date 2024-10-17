@@ -104,7 +104,7 @@ const activePush = () => {
   });
 };
 activePush();
-const cacheName = "blinky-cache-beta-v7";
+const cacheName = "blinky-cache-beta-v8";
 
 const cacheClone = async (e) => {
   const res = await fetch(e.request);

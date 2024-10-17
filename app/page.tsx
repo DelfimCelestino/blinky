@@ -33,7 +33,6 @@ export default function Home() {
 
   const handleTabChange = (value: string) => {
     setActiveTab(value);
-    router.push(`?tab=${value}`);
   };
 
   return (

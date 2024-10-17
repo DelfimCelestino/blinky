@@ -121,12 +121,7 @@ export default function FinanceDashboard() {
 
   useEffect(() => {
     fetchData();
-    const tab = searchParams.get("tab");
-    if (tab && ["overview", "income-expenses", "savings"].includes(tab)) {
-      setActiveTab(tab);
-    } else {
-      setActiveTab("overview");
-    }
+
     setSelectedMonth(format(new Date(), "yyyy-MM"));
   }, [searchParams]);
 
@@ -308,7 +303,6 @@ export default function FinanceDashboard() {
 
   const handleTabChange = (value: string) => {
     setActiveTab(value);
-    router.push(`?tab=${value}`);
   };
 
   const currentYear = new Date().getFullYear();
