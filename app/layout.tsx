@@ -7,6 +7,7 @@ import PWAInstallPrompt from "@/components/pwa-install";
 import Header from "@/components/header";
 import { UniversalProvider } from "@/context/Universal-context-provider";
 import Script from "next/script";
+import { Suspense } from "react";
 
 const roboto_condensed = Roboto_Condensed({ subsets: ["latin"] });
 
@@ -49,7 +50,9 @@ export default function RootLayout({
         >
           <UniversalProvider>
             <Header />
-            <main className="py-16">{children}</main>
+            <Suspense>
+              <main className="py-16">{children}</main>
+            </Suspense>
           </UniversalProvider>
         </ThemeProvider>
         <PWAInstallPrompt />

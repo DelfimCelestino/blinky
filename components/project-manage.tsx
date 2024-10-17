@@ -61,9 +61,21 @@ export default function ProjectManage() {
     } else if (project.progress <= 80) {
       return "😊 Em andamento, vamos a isso";
     } else if (project.progress === 100) {
-      return "🎉 Parabéns! Concluído";
+      return "🎉 Parabéns! Projeto concluído com sucesso!";
     } else {
       return "";
+    }
+  };
+
+  const getMotivationalMessage = (completedProjects: number) => {
+    if (completedProjects === 0) {
+      return "Você ainda não concluiu nenhum projeto. Vamos começar! 💪";
+    } else if (completedProjects === 1) {
+      return "Parabéns pela sua primeira conclusão! Continue assim! 🌟";
+    } else if (completedProjects < 5) {
+      return `Incrível! Você já concluiu ${completedProjects} projetos. Está no caminho certo! 🚀`;
+    } else {
+      return `Uau! ${completedProjects} projetos concluídos! Você é imparável! 🏆`;
     }
   };
 
@@ -75,6 +87,10 @@ export default function ProjectManage() {
       statusFilter === "Todos" || project.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
+
+  const completedProjects = projects.filter(
+    (project) => project.status === "Concluído"
+  ).length;
 
   if (isLoading) {
     return (
@@ -111,6 +127,11 @@ export default function ProjectManage() {
       </div>
 
       <AnimatePresence>
+        <div className="mb-6">
+          <p className="text-lg text-muted-foreground">
+            {getMotivationalMessage(completedProjects)}
+          </p>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredProjects.map((project) => (
             <motion.div
@@ -197,8 +218,8 @@ export default function ProjectManage() {
                 const formData = new FormData(e.currentTarget);
                 const updatedProject: Project = {
                   ...editingProject,
-                  name: (formData.get("name") as string) || "", // Garantindo que name nunca seja null
-                  manager: (formData.get("manager") as string) || "", // Garantindo que manager nunca seja null
+                  name: (formData.get("name") as string) || "",
+                  manager: (formData.get("manager") as string) || "",
                   status:
                     (formData.get("status") as
                       | "Não Iniciado"
