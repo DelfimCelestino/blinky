@@ -128,7 +128,7 @@ export default function ProjectManage() {
 
       <AnimatePresence>
         <div className="mb-6">
-          <p className="text-lg text-muted-foreground">
+          <p className="text-xs lg:text-lg text-muted-foreground">
             {getMotivationalMessage(completedProjects)}
           </p>
         </div>
