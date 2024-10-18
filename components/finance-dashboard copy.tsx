@@ -240,27 +240,6 @@ export default function FinanceDashboard() {
     });
   };
 
-  const achieveSavingsGoal = (goal: SavingsGoal) => {
-    // Remove the goal from savings goals
-    const updatedSavingsGoals = savingsGoals.filter((g) => g.id !== goal.id);
-    setSavingsGoals(updatedSavingsGoals);
-    localStorage.setItem("savingsGoals", JSON.stringify(updatedSavingsGoals));
-
-    // Add the goal as an expense
-    const newExpense: Omit<Expense, "id"> = {
-      amount: goal.targetAmount,
-      category: "Meta Alcançada",
-      description: goal.name,
-      date: new Date(),
-    };
-    addExpense(newExpense);
-
-    toast({
-      title: "Meta de economia alcançada!",
-      description: `Parabéns! Você alcançou sua meta "${goal.name}". 🎉`,
-    });
-  };
-
   const filteredIncome = income.filter((item) => {
     const itemDate = new Date(item.date);
     const filterDate = parse(selectedMonth, "yyyy-MM", new Date());
@@ -521,15 +500,6 @@ export default function FinanceDashboard() {
                         Poupança restante após atingir a meta: $
                         {remainingSavings.toFixed(2)}
                       </p>
-                      <div className="flex justify-end mt-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => achieveSavingsGoal(goal)}
-                        >
-                          Alcancei
-                        </Button>
-                      </div>
                     </motion.div>
                   );
                 })}
@@ -811,14 +781,7 @@ export default function FinanceDashboard() {
                             Poupança restante após atingir a meta: $
                             {remainingSavings.toFixed(2)}
                           </p>
-                          <div className="flex justify-end mt-2 space-x-2">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => achieveSavingsGoal(goal)}
-                            >
-                              Alcancei
-                            </Button>
+                          <div className="flex justify-end mt-2">
                             <Button
                               variant="ghost"
                               size="sm"
@@ -985,25 +948,15 @@ export default function FinanceDashboard() {
                 <Label htmlFor="category" className="text-left">
                   Categoria
                 </Label>
-                <Select
+                <Input
+                  id="category"
+                  className="col-span-3 w-full"
                   value={newExpense.category}
-                  onValueChange={(value) =>
-                    setNewExpense({ ...newExpense, category: value })
+                  onChange={(e) =>
+                    setNewExpense({ ...newExpense, category: e.target.value })
                   }
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Selecione a categoria" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Alimentação">Alimentação</SelectItem>
-                    <SelectItem value="Transporte">Transporte</SelectItem>
-                    <SelectItem value="Moradia">Moradia</SelectItem>
-                    <SelectItem value="Saúde">Saúde</SelectItem>
-                    <SelectItem value="Educação">Educação</SelectItem>
-                    <SelectItem value="Lazer">Lazer</SelectItem>
-                    <SelectItem value="Outros">Outros</SelectItem>
-                  </SelectContent>
-                </Select>
+                  required
+                />
               </div>
               <div className="grid  gap-4">
                 <Label htmlFor="description" className="text-left">

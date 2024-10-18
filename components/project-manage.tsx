@@ -32,6 +32,7 @@ export default function ProjectManage() {
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("Todos");
+  const [typeFilter, setTypeFilter] = useState("Todos");
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -85,7 +86,8 @@ export default function ProjectManage() {
       (project.manager?.toLowerCase() || "").includes(searchTerm.toLowerCase());
     const matchesStatus =
       statusFilter === "Todos" || project.status === statusFilter;
-    return matchesSearch && matchesStatus;
+    const matchesType = typeFilter === "Todos" || project.type === typeFilter;
+    return matchesSearch && matchesStatus && matchesType;
   });
 
   const completedProjects = projects.filter(
@@ -124,6 +126,17 @@ export default function ProjectManage() {
             <SelectItem value="Concluído">Concluído</SelectItem>
           </SelectContent>
         </Select>
+        <Select value={typeFilter} onValueChange={setTypeFilter}>
+          <SelectTrigger className="w-full sm:w-[180px]">
+            <SelectValue placeholder="Filtrar por tipo" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="Todos">Todos os Tipos</SelectItem>
+            <SelectItem value="Side Project">Side Project</SelectItem>
+            <SelectItem value="Freelancer">Freelancer</SelectItem>
+            <SelectItem value="CLT">CLT</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       <AnimatePresence>
@@ -133,9 +146,9 @@ export default function ProjectManage() {
           </p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredProjects.map((project) => (
+          {filteredProjects.map((project, index) => (
             <motion.div
-              key={project.id}
+              key={index}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
@@ -173,11 +186,18 @@ export default function ProjectManage() {
                 </CardHeader>
                 <CardContent>
                   <div className="mb-4 flex items-center justify-between">
-                    <Badge
-                      className={`${getStatusColor(project.status)} text-white`}
-                    >
-                      {project.status}
-                    </Badge>
+                    <div className="flex items-center space-x-2">
+                      <Badge
+                        className={`${getStatusColor(
+                          project.status
+                        )} text-white`}
+                      >
+                        {project.status}
+                      </Badge>
+                      <Badge className="bg-blue-500 text-white">
+                        {project.type}
+                      </Badge>
+                    </div>
                     <span className="text-sm font-medium text-gray-600 dark:text-gray-300">
                       {project.progress}% Concluído
                     </span>
@@ -225,6 +245,11 @@ export default function ProjectManage() {
                       | "Não Iniciado"
                       | "Em Andamento"
                       | "Concluído") || "Não Iniciado",
+                  type:
+                    (formData.get("type") as
+                      | "Side Project"
+                      | "Freelancer"
+                      | "CLT") || "Side Project",
                   progress:
                     formData.get("progress") !== null
                       ? parseInt(formData.get("progress") as string, 10) || 0
@@ -261,6 +286,17 @@ export default function ProjectManage() {
                 <SelectItem value="Não Iniciado">Não Iniciado</SelectItem>
                 <SelectItem value="Em Andamento">Em Andamento</SelectItem>
                 <SelectItem value="Concluído">Concluído</SelectItem>
+              </SelectContent>
+            </Select>
+            <Label htmlFor="type">Tipo de Projeto</Label>
+            <Select name="type" defaultValue={editingProject?.type}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Side Project">Side Project</SelectItem>
+                <SelectItem value="Freelancer">Freelancer</SelectItem>
+                <SelectItem value="CLT">CLT</SelectItem>
               </SelectContent>
             </Select>
             <Label htmlFor="progress">Progresso</Label>
